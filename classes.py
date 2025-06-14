@@ -48,6 +48,6 @@ class Tree:
                 node.hijos.append(hijo)
         
         # Aplicar Minimax: seleccionar el mejor valor de los hijos
-        valores = [h.valores for h in node.hijos]
+        valores = [h.valor for h in node.hijos]
         node.valor = max(valores) if node.jugador == "X" else min(valores)
         return node.valor
