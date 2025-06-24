@@ -12,15 +12,24 @@ class Node:
 
     def ganador(self, jugador):
         # Comprobaciones de victoria: filas, columnas y diagonales
-        combos = [(0,1,2), (3,4,5), (6,7,8),     # 3 Filas
-                  (0,3,6), (1,4,7), (2,5,8),     # 3 Columnas
-                  (0,4,8), (2,4,6)]              # 2 Diagonales
+        combos = [(0,1,2), (3,4,5), (6,7,8),
+                  (0,3,6), (1,4,7), (2,5,8),
+                  (0,4,8), (2,4,6)]
         return any(all(self.tablero[i] == jugador for i in combo) for combo in combos)
-    
+
+    def combinacion_ganadora(self, jugador):
+        combos = [(0,1,2), (3,4,5), (6,7,8),
+                  (0,3,6), (1,4,7), (2,5,8),
+                  (0,4,8), (2,4,6)]
+        for combo in combos:
+            if all(self.tablero[i] == jugador for i in combo):
+                return combo
+        return None
+
 class Tree:
     def __init__(self, root):
         self.root = root
-    
+
     def evaluar(self, node):
         # Valor numérico del estado: 1 si gana X, -1 si gana O, 0 si empate
         if node.ganador("X"):
@@ -29,16 +38,15 @@ class Tree:
             return -1
         else:
             return 0
-    
+
     def construir(self, node):
         # Si el nodo actual es terminal (hoja), se evalúa directamente
         if node.es_hoja():
             node.valor = self.evaluar(node)
             return node.valor
-        
-        siguiente = "O" if node.jugador == "X" else "X" # Cambiar de jugador, es decir, alterna entre X y O
-        
-        # Generar todos los hijos posibles desde este nodo (cada jugada legal)
+
+        siguiente = "O" if node.jugador == "X" else "X"
+
         for i in range(9):
             if node.tablero[i] == " ":
                 nuevo_tablero = node.tablero[:]
@@ -46,8 +54,7 @@ class Tree:
                 hijo = Node(nuevo_tablero, siguiente, movimiento=i)
                 self.construir(hijo)
                 node.hijos.append(hijo)
-        
-        # Aplicar Minimax: seleccionar el mejor valor de los hijos
+
         valores = [h.valor for h in node.hijos]
         node.valor = max(valores) if node.jugador == "X" else min(valores)
         return node.valor

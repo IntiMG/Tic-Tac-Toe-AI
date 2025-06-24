@@ -9,8 +9,6 @@ victorias_jugador = 0
 victorias_ia = 0
 empates = 0
 
-
-
 class TicTacToeCanvasApp:
     def __init__(self, root, jugador_humano):
         global victorias_jugador, victorias_ia, empates
@@ -28,7 +26,7 @@ class TicTacToeCanvasApp:
 
         self.marco_puntaje = tk.Frame(self.root, bg="black")
         self.marco_puntaje.pack(pady=5)
-        self.label_puntaje = tk.Label(self.marco_puntaje, text="", font=("Arial", 12), bg="black", fg="white")
+        self.label_puntaje = tk.Label(self.marco_puntaje, text="", font=("Cascadia Code", 12), bg="black", fg="white")
         self.label_puntaje.pack()
         self.actualizar_puntaje()
 
@@ -75,7 +73,10 @@ class TicTacToeCanvasApp:
 
     def comprobar_fin(self):
         global victorias_jugador, victorias_ia, empates
-        if Node(self.tablero, self.turno).ganador(self.turno):
+        nodo = Node(self.tablero, self.turno)
+        combinacion = nodo.combinacion_ganadora(self.turno)
+        if combinacion:
+            self.dibujar_linea_ganadora(combinacion)
             if self.turno == self.jugador_humano:
                 self.victorias_jugador += 1
                 victorias_jugador = self.victorias_jugador
@@ -83,30 +84,39 @@ class TicTacToeCanvasApp:
                 self.victorias_ia += 1
                 victorias_ia = self.victorias_ia
             self.actualizar_puntaje()
-            messagebox.showinfo("Fin del juego", f"¡Ganó {self.turno}!")
-            self.mostrar_boton_reinicio()
+            self.root.after(800, lambda: messagebox.showinfo("Fin del juego", f"¡Ganó {self.turno}!"))
+            self.root.after(1500, self.mostrar_boton_reinicio)
             return True
         elif ' ' not in self.tablero:
             self.empates += 1
             empates = self.empates
             self.actualizar_puntaje()
-            messagebox.showinfo("Fin del juego", "Empate")
-            self.mostrar_boton_reinicio()
+            self.root.after(500, lambda: messagebox.showinfo("Fin del juego", "Empate"))
+            self.root.after(1200, self.mostrar_boton_reinicio)
             return True
         return False
-    
+
+    def dibujar_linea_ganadora(self, combo):
+        coordenadas = {
+            0: (50, 50), 1: (150, 50), 2: (250, 50),
+            3: (50, 150), 4: (150, 150), 5: (250, 150),
+            6: (50, 250), 7: (150, 250), 8: (250, 250)
+        }
+        x1, y1 = coordenadas[combo[0]]
+        x2, y2 = coordenadas[combo[2]]
+        self.canvas.create_line(x1, y1, x2, y2, fill="fuchsia", width=6)
+
     def reiniciar_juego(self):
-        self.root.destroy()  # Cierra la ventana actual
-        iniciar_juego()      # Vuelve al menú de selección de ficha
-    
+        self.root.destroy()
+        iniciar_juego()
+
     def mostrar_boton_reinicio(self):
-        self.boton_reinicio = tk.Button(self.root, text="Reiniciar", font=("Arial", 12), command=self.reiniciar_juego)
+        self.boton_reinicio = tk.Button(self.root, bg="black", fg="white", text="Reiniciar", font=("Cascadia Code", 12), command=self.reiniciar_juego)
         self.boton_reinicio.pack(pady=10)
-    
+
     def actualizar_puntaje(self):
         texto = f"👤 Jugador: {self.victorias_jugador}   🤖 IA: {self.victorias_ia}   ⚖️ Empates: {self.empates}"
         self.label_puntaje.config(text=texto)
-    
 
 def iniciar_juego():
     def seleccionar_jugador(j):
@@ -119,9 +129,9 @@ def iniciar_juego():
     menu = tk.Tk()
     menu.title("Selecciona tu ficha")
     menu.configure(bg="black")
-    tk.Label(menu, text="¿Con qué ficha quieres jugar?", font=("Arial", 14), bg="black", fg="white").pack(pady=10)
-    tk.Button(menu, text="X", font=("Arial", 12), width=10, command=lambda: seleccionar_jugador('X')).pack(pady=5)
-    tk.Button(menu, text="O", font=("Arial", 12), width=10, command=lambda: seleccionar_jugador('O')).pack(pady=5)
+    tk.Label(menu, text="¿Con qué ficha quieres jugar?", font=("Cascadia Code", 14), bg="black", fg="white").pack(pady=10)
+    tk.Button(menu, text="X", font=("Cascadia Code", 12), fg="blue", width=10, command=lambda: seleccionar_jugador('X')).pack(pady=5)
+    tk.Button(menu, text="O", font=("Cascadia Code", 12), fg="deeppink", width=10, command=lambda: seleccionar_jugador('O')).pack(pady=5)
     menu.mainloop()
 
 if __name__ == '__main__':
